@@ -9,12 +9,14 @@ dependencies = [
     "numpy",
     "scipy"
 ]
-description = "A package for constructing risk-stratified household compartmental infection models"
+description = "Functions for constructing risk-stratified household compartmental infection models"
 requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
+license = "Apache-2.0"
+license-files = ["LICEN[CS]E*"]
 
 [project.urls]
 Homepage = "https://github.com/jbhilton/hcompbuild"
