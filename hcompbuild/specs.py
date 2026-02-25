@@ -209,7 +209,7 @@ SINGLE_AGE_UK_SPEC = {
         'sheet_name': 'United Kingdom of Great Britain'
     },
     # Load in age pyramid:
-    'pop_pyramid_file_name': abspath(join(dirname( __file__ ), '..', 'inputs/United Kingdom-2019.csv')),
+    'pop_pyramid_file_name': abspath(join(dirname( __file__ ), '..', 'inputs/uk_pop_pyramid_2019.csv')),
             'fine_bds' : arange(0,81,5),    # Boundaries used in contact data
     'coarse_bds' : array([0]),  # Desired boundaries for model population
     'adult_bd' : 1
@@ -224,7 +224,7 @@ TWO_AGE_UK_SPEC = {
         'file_name': abspath(join(dirname( __file__ ), '..', 'inputs/uk_contacts_all.csv')),
         'sheet_name': 'United Kingdom of Great Britain'
     },
-    'pop_pyramid_file_name': abspath(join(dirname( __file__ ), '..', 'inputs/United Kingdom-2019.csv')),
+    'pop_pyramid_file_name': abspath(join(dirname( __file__ ), '..', 'inputs/uk_pop_pyramid_2019.csv')),
     'fine_bds' : arange(0,81,5),
     'coarse_bds' : array([0,20]),
     'adult_bd' : 1

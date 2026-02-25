@@ -9,7 +9,7 @@ dependencies = [
     "numpy",
     "scipy"
 ]
-description = "Functions for constructing risk-stratified household compartmental infection models"
+description = "Python tools for constructing risk-stratified household compartmental infection models"
 requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Python :: 3",
