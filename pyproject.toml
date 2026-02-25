@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hcompbuild"
+version = "2026.0.0"
+dependencies = [
+    "numpy",
+    "scipy"
+]
+description = "A package for constructing risk-stratified household compartmental infection models"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/jbhilton/hcompbuild"
+Issues = "https://github.com/jbhilton/hcompbuild/issues"
