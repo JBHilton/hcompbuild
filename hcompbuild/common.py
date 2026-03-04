@@ -1,8 +1,10 @@
 '''Module for additional computations required by the model'''
+from copy import deepcopy
 from numpy import (
     arange, array, diag, isnan,
     shape, sum, where, zeros)
 from scipy.sparse import csc_matrix as sparse
+from hcompbuild.preprocessing import estimate_beta_ext, HouseholdPopulation
 from hcompbuild.subsystems import subsystem_key
 from os import mkdir
 from os.path import isdir
@@ -96,10 +98,7 @@ def update_ext_matrices(rhs, t, H):
 class RateEquations:
     '''This class represents a functor for evaluating the rate equations for
     the model with no imports of infection from outside the population. The
-    state of the class contains all essential variables. This method uses
-    more preallocation in calculating the external infection terms, although
-    does not currently appear to be more computationally efficient than the
-    RateEquations approach.'''
+    state of the class contains all essential variables.'''
     # pylint: disable=invalid-name
     def __init__(self,
                  model_input,
@@ -437,3 +436,39 @@ class SEDURRateEquations(RateEquations):
     @property
     def states_rec_only(self):
         return self.household_population.states[:, 4::self.no_compartments]
+
+def callibrate_model_input(model_input_to_fit,
+                           import_model,
+                           growth_rate):
+    '''
+    Calculate an external transmission rate that results in a specified growth rate, given some internal dynamics.
+
+    Parameters
+    ----------
+    model_input_to_fit : ModelInput
+        Model input with uncalibrated external transmission rate
+    import_model : ImportModel
+        Import model
+    growth_rate : float
+        Exponential growth rate to calibrate to
+
+    Returns
+    -------
+    model_input : ModelInput
+        Copy of model_input_to_fit with external transmission rate calibrated to growth rate
+    beta_ext : float
+        External transmission rate calibrated to growth rate
+    '''
+    household_population_to_fit = HouseholdPopulation(
+        model_input_to_fit.composition_list,
+        model_input_to_fit.composition_distribution,
+        model_input_to_fit)
+    rhs_to_fit = SEIRRateEquations(model_input_to_fit,
+                                   household_population_to_fit,
+                                   import_model)
+    beta_ext = estimate_beta_ext(household_population_to_fit,
+                                 rhs_to_fit,
+                                 growth_rate)
+    model_input = deepcopy(model_input_to_fit)
+    model_input.k_ext *= beta_ext
+    return model_input, beta_ext

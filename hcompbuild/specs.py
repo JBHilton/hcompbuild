@@ -81,7 +81,9 @@ TWO_AGE_SIR_SPEC = {
                           SYMPTOM_PERIOD),           # Recovery rate
     'sus': array([1,1]),          # Relative susceptibility by
                                   # age/vulnerability class
-    'fit_method' : 'R*'
+    'fit_method' : 'R*',
+    'Description' : 'Epidemiological parameters for a susceptible-infectious-recovered (SIR) model with two risk'
+                    'classes, to be calibrated to an estimate of household reproductive ratio R*.'
 }
 
 TWO_AGE_SIR_SPEC_FOR_FITTING = {
@@ -92,7 +94,9 @@ TWO_AGE_SIR_SPEC_FOR_FITTING = {
                           SYMPTOM_PERIOD),           # Recovery rate
     'sus': array([1,1]),          # Relative susceptibility by
                                   # age/vulnerability class
-    'fit_method' : 'EL'
+    'fit_method' : 'EL',
+    'Description' : 'Epidemiological parameters for a susceptible-infectious-recovered (SIR) model with two risk'
+                    'classes, to be calibrated to an estimated growth rate r.'
 }
 
 SINGLE_AGE_SEIR_SPEC = {
@@ -104,7 +108,9 @@ SINGLE_AGE_SEIR_SPEC = {
     'incubation_rate': 1 / LATENT_PERIOD,         # E->I incubation rate
     'sus': array([1]),          # Relative susceptibility by
                                   # age/vulnerability class
-    'fit_method' : 'R*'
+    'fit_method' : 'R*',
+    'Description' : 'Epidemiological parameters for a susceptible-exposed-infectious-recovered (SEIR) model with a'
+                    'single risk class, to be calibrated to an estimate of household reproductive ratio R*.'
 }
 
 SINGLE_AGE_SEIR_SPEC_FOR_FITTING = {
@@ -115,7 +121,9 @@ SINGLE_AGE_SEIR_SPEC_FOR_FITTING = {
     'incubation_rate': 1 / LATENT_PERIOD,         # E->I incubation rate
     'sus': array([1]),          # Relative susceptibility by
                                   # age/vulnerability class
-    'fit_method' : 'EL'
+    'fit_method' : 'EL',
+    'Description' : 'Epidemiological parameters for a susceptible-exposed-infectious-recovered (SEIR) model with a'
+                    'single risk class, to be calibrated to an estimated growth rate r.'
 }
 
 TWO_AGE_SEIR_SPEC = {
@@ -127,7 +135,9 @@ TWO_AGE_SEIR_SPEC = {
     'incubation_rate': 1 / LATENT_PERIOD,         # E->I incubation rate
     'sus': array([1,1]),          # Relative susceptibility by
                                   # age/vulnerability class
-    'fit_method' : 'R*'
+    'fit_method' : 'R*',
+    'Description' : 'Epidemiological parameters for a susceptible-exposed-infectious-recovered (SEIR) model with two'
+                    'risk classes, to be calibrated to an estimate of household reproductive ratio R*.'
 }
 
 TWO_AGE_SEIR_SPEC_FOR_FITTING = {
@@ -138,7 +148,9 @@ TWO_AGE_SEIR_SPEC_FOR_FITTING = {
     'incubation_rate': 1 / LATENT_PERIOD,         # E->I incubation rate
     'sus': array([1,1]),          # Relative susceptibility by
                                   # age/vulnerability class
-    'fit_method' : 'EL'
+    'fit_method' : 'EL',
+    'Description' : 'Epidemiological parameters for a susceptible-exposed-infectious-recovered (SEIR) model with two'
+                    'risk classes, to be calibrated to an estimated growth rate r.'
 }
 
 TWO_AGE_SEPIR_SPEC = {
@@ -153,7 +165,9 @@ TWO_AGE_SEPIR_SPEC = {
                                 # full inf transmission
     'sus': array([1,1]),          # Relative susceptibility by
                                   # age/vulnerability class
-    'fit_method' : 'R*'
+    'fit_method' : 'R*',
+    'Description' : 'Epidemiological parameters for a susceptible-exposed-prodromal-infectious-recovered (SEPIR) model'
+                    'with two risk classes, to be calibrated to an estimate of household reproductive ratio R*.'
 }
 
 TWO_AGE_SEPIR_SPEC_FOR_FITTING = {
@@ -167,7 +181,9 @@ TWO_AGE_SEPIR_SPEC_FOR_FITTING = {
                                 # full inf transmission
     'sus': array([1,1]),          # Relative susceptibility by
                                   # age/vulnerability class
-    'fit_method' : 'EL'
+    'fit_method' : 'EL',
+    'Description' : 'Epidemiological parameters for a susceptible-exposed-prodromal-infectious-recovered (SEPIR) model'
+                    'with two risk classes, to be calibrated to an estimate of household reproductive ratio R*.'
 }
 
 TWO_AGE_EXT_SEPIRQ_SPEC = {
@@ -195,7 +211,9 @@ TWO_AGE_EXT_SEPIRQ_SPEC = {
      array([0,0]),          # Isolated transmission intensity relative to full
                             # inf transmission
     'sus': array([1,1]),    # Relative susceptibility by age/vulnerability class
-    'fit_method' : 'EL'
+    'fit_method' : 'EL',
+    'Description' : 'Epidemiological parameters for a susceptible-exposed-prodromal-infectious-recovered-quarantine'
+                    '(SEPIRQ) model with two risk classes, to be calibrated to an estimated growth rate r.'
 }
 
 SINGLE_AGE_UK_SPEC = {
@@ -212,7 +230,9 @@ SINGLE_AGE_UK_SPEC = {
     'pop_pyramid_file_name': abspath(join(dirname( __file__ ), 'inputs/uk_pop_pyramid_2019.csv')),
             'fine_bds' : arange(0,81,5),    # Boundaries used in contact data
     'coarse_bds' : array([0]),  # Desired boundaries for model population
-    'adult_bd' : 1
+    'adult_bd' : 1,
+    'Description' : 'Demographic parameters based on UK-specific contact and population structures with a single risk'
+                    'class.'
 }
 
 TWO_AGE_UK_SPEC = {
@@ -227,7 +247,9 @@ TWO_AGE_UK_SPEC = {
     'pop_pyramid_file_name': abspath(join(dirname( __file__ ), 'inputs/uk_pop_pyramid_2019.csv')),
     'fine_bds' : arange(0,81,5),
     'coarse_bds' : array([0,20]),
-    'adult_bd' : 1
+    'adult_bd' : 1,
+    'Description' : 'Demographic parameters based on UK-specific contact and population structures with the population'
+                    'divided into two age classes, 0-19 year-old\'s and 20+ year-old\'s.'
 }
 
 VACC_INF_RED = .9
@@ -247,7 +269,9 @@ SEIR_VACC_SPEC = {
     'fit_method' : 'EL',
     'k_home': ones((2, 2), dtype=float),
     'k_ext': ones((2, 2), dtype=float),
-    'skip_ext_scale' : True
+    'skip_ext_scale' : True,
+    'Description' : 'Epidemiological parameters for a susceptible-exposed-infectious-recovered (SEIR) model with a'
+                    'population divided into vaccinated and unvaccinated individuals.'
 }
 
 # The following is intended to be used while we are testing inference methods
@@ -263,5 +287,7 @@ SINGLE_TYPE_INFERENCE_SPEC = {
     'fit_method' : 'EL',
     'k_home': ones((1, 1), dtype=float),
     'k_ext': ones((1, 1), dtype=float),
-    'skip_ext_scale' : True
+    'skip_ext_scale' : True,
+    'Description' : 'Epidemiological parameters for performing inference with a susceptible-exposed-infectious-'
+                    'recovered (SEIR) model with a single risk class.'
 }
