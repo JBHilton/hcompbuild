@@ -20,7 +20,7 @@ from scipy.stats import binom
 from time import time as get_time
 from tqdm import tqdm
 import warnings
-from hcompbuild.common import sparse
+from scipy.sparse import csc_matrix as sparse
 from hcompbuild.subsystems import subsystem_key
 
 MAX_OUTBREAK_DURATION = 365 # Duration used for integration of within-hh
