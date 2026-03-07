@@ -31,7 +31,7 @@ def make_initial_condition_by_eigenvector(growth_rate,
                                          household_population,
                                          rhs,
                                          prev=1e-5,
-                                         starting_immunity=1e-2,
+                                         starting_immunity=0.,
                                          return_AR = False,
                                          R_comp = 4,
                                          S_comp = 0):
@@ -396,8 +396,8 @@ def calculate_sitp(x, model_input, sitp_data):
 class ModelInput(ABC):
     def __init__(self,
                 spec,
-                composition_list,
-                composition_distribution,
+                composition_list=None,
+                composition_distribution=None,
                 header=None):
         self.spec = deepcopy(spec)
 
@@ -410,6 +410,8 @@ class ModelInput(ABC):
 
         self.new_case_compartment = \
             subsystem_key[self.compartmental_structure][3]
+
+
 
         # If dictionary keys exist for age-structured model, set up age structured mixing, otherwise read mixing
         # matrices in directly from dictionary
@@ -456,8 +458,15 @@ class ModelInput(ABC):
             self.k_ext = spec['k_ext']
             self.no_age_classes = self.k_home.shape[0]
 
-        self.composition_list = composition_list
-        self.composition_distribution = composition_distribution
+        if composition_list is None:
+            self.composition_list = spec['composition_list']
+        else:
+            self.composition_list = composition_list
+
+        if composition_distribution is None:
+            self.composition_distribution = spec['composition_distribution']
+        else:
+            self.composition_distribution = composition_distribution
 
     @property
     def hh_size_list(self):
@@ -486,7 +495,7 @@ class ModelInput(ABC):
         return eig(k_home_scaled)[0].max()
 
 class SIRInput(ModelInput):
-    def __init__(self, spec, composition_list, composition_distribution):
+    def __init__(self, spec, composition_list=None, composition_distribution=None):
         super().__init__(spec, composition_list, composition_distribution)
 
         self.expandables = ['sus']
@@ -524,19 +533,22 @@ class SIRInput(ModelInput):
 
         self.k_home = self.beta_int * self.k_home
 
-        if (not {'skip_ext_scale'} <= spec.keys()) or (not spec['skip_ext_scale']):
-            ext_eig = max(eig(
-                diag(self.sus).dot((1 / spec['recovery_rate']) *
-                                   (self.k_ext).dot(diag(self.inf_scales[0])))
-            )[0])
-            if spec['fit_method'] == 'R*':
-                external_scale = spec['R*'] / (self.ave_hh_size * spec['SITP'])
-            else:
-                external_scale = 1
-            self.k_ext = external_scale * self.k_ext / ext_eig
+        if {'beta_ext'} <= spec.keys():
+            self.k_ext = spec['beta_ext'] * self.k_ext
+        else:
+            if (not {'skip_ext_scale'} <= spec.keys()) or (not spec['skip_ext_scale']):
+                ext_eig = max(eig(
+                    diag(self.sus).dot((1 / spec['recovery_rate']) *
+                                       (self.k_ext).dot(diag(self.inf_scales[0])))
+                )[0])
+                if spec['fit_method'] == 'R*':
+                    external_scale = spec['R*'] / (self.ave_hh_size * spec['SITP'])
+                else:
+                    external_scale = 1
+                self.k_ext = external_scale * self.k_ext / ext_eig
 
 class SEIRInput(ModelInput):
-    def __init__(self, spec, composition_list, composition_distribution, print_ests=True):
+    def __init__(self, spec, composition_list=None, composition_distribution=None, print_ests=True):
         super().__init__(spec, composition_list, composition_distribution)
 
         self.expandables = ['sus',
@@ -555,7 +567,7 @@ class SEIRInput(ModelInput):
 
         self.prog_rates = array([self.gamma])
 
-        if {'beta_int', 'density_expo'} <= spec.keys():
+        if {'beta_int'} <= spec.keys():
             self.beta_int = spec['beta_int']
             if {'density_expo'} <= spec.keys():
                 self.density_expo = spec['density_expo']
@@ -572,23 +584,26 @@ class SEIRInput(ModelInput):
 
         self.k_home = self.beta_int * self.k_home
 
-        if (not {'skip_ext_scale'} <= spec.keys()) or (not spec['skip_ext_scale']):
-            ext_eig = max(eig(
-                diag(self.sus).dot((1/spec['recovery_rate']) *
-                 (self.k_ext).dot(diag(self.inf_scales[0])))
-                )[0])
-            if spec['fit_method'] == 'R*':
-                external_scale = spec['R*'] / (self.ave_hh_size*spec['SITP'])
-            else:
-                external_scale = 1
-            self.k_ext = external_scale * self.k_ext / ext_eig
+        if {'beta_ext'} <= spec.keys():
+            self.k_ext = spec['beta_ext'] * self.k_ext
+        else:
+            if (not {'skip_ext_scale'} <= spec.keys()) or (not spec['skip_ext_scale']):
+                ext_eig = max(eig(
+                    diag(self.sus).dot((1/spec['recovery_rate']) *
+                     (self.k_ext).dot(diag(self.inf_scales[0])))
+                    )[0])
+                if spec['fit_method'] == 'R*':
+                    external_scale = spec['R*'] / (self.ave_hh_size*spec['SITP'])
+                else:
+                    external_scale = 1
+                self.k_ext = external_scale * self.k_ext / ext_eig
 
     @property
     def alpha(self):
         return self.spec['incubation_rate']
 
 class SEPIRInput(ModelInput):
-    def __init__(self, spec, composition_list, composition_distribution):
+    def __init__(self, spec, composition_list=None, composition_distribution=None):
         super().__init__(spec, composition_list, composition_distribution)
 
         self.expandables = ['sus',
@@ -617,7 +632,7 @@ class SEPIRInput(ModelInput):
 
         self.prog_rates = array([self.alpha_2, self.gamma])
 
-        if {'beta_int', 'density_expo'} <= spec.keys():
+        if {'beta_int'} <= spec.keys():
             self.beta_int = spec['beta_int']
             if {'density_expo'} <= spec.keys():
                 self.density_expo = spec['density_expo']
@@ -633,25 +648,28 @@ class SEPIRInput(ModelInput):
 
         self.k_home = self.beta_int * self.k_home
 
-        if (not {'skip_ext_scale'} <= spec.keys()) or (not spec['skip_ext_scale']):
-            ext_eig = max(eig(
-                diag(self.sus).dot((1/spec['symp_onset_rate']) *
-                 (self.k_ext).dot(self.inf_scales[0]) +
-                 (1/spec['recovery_rate']) *
-                  (self.k_ext).dot(diag(self.inf_scales[1])))
-                )[0])
-            if spec['fit_method'] == 'R*':
-                external_scale = spec['R*'] / (self.ave_hh_size*spec['SITP'])
-            else:
-                external_scale = 1
-            self.k_ext = external_scale * self.k_ext / ext_eig
+        if {'beta_ext'} <= spec.keys():
+            self.k_ext = spec['beta_ext'] * self.k_ext
+        else:
+            if (not {'skip_ext_scale'} <= spec.keys()) or (not spec['skip_ext_scale']):
+                ext_eig = max(eig(
+                    diag(self.sus).dot((1/spec['symp_onset_rate']) *
+                     (self.k_ext).dot(self.inf_scales[0]) +
+                     (1/spec['recovery_rate']) *
+                      (self.k_ext).dot(diag(self.inf_scales[1])))
+                    )[0])
+                if spec['fit_method'] == 'R*':
+                    external_scale = spec['R*'] / (self.ave_hh_size*spec['SITP'])
+                else:
+                    external_scale = 1
+                self.k_ext = external_scale * self.k_ext / ext_eig
 
     @property
     def alpha_1(self):
         return self.spec['incubation_rate']
 
 class SEPIRQInput(ModelInput):
-    def __init__(self, spec, composition_list, composition_distribution):
+    def __init__(self, spec, composition_list=None, composition_distribution=None):
         super().__init__(spec, composition_list, composition_distribution)
 
         self.expandables = ['sus',
@@ -682,7 +700,7 @@ class SEPIRQInput(ModelInput):
 
         self.prog_rates = array([self.alpha_2, self.gamma, self.discharge_rate])
 
-        if {'beta_int', 'density_expo'} <= spec.keys():
+        if {'beta_int'} <= spec.keys():
             self.beta_int = spec['beta_int']
             if {'density_expo'} <= spec.keys():
                 self.density_expo = spec['density_expo']
@@ -699,18 +717,21 @@ class SEPIRQInput(ModelInput):
 
         self.k_home = self.beta_int * self.k_home
 
-        if (not {'skip_ext_scale'} <= spec.keys()) or (not spec['skip_ext_scale']):
-            ext_eig = max(eig(
-                diag(self.sus).dot((1/spec['symp_onset_rate']) *
-                 (self.k_ext).dot(self.inf_scales[0]) +
-                 (1/spec['recovery_rate']) *
-                  (self.k_ext).dot(diag(self.inf_scales[1])))
-                )[0])
-            if spec['fit_method'] == 'R*':
-                external_scale = spec['R*'] / (self.ave_hh_size*spec['SITP'])
-            else:
-                external_scale = 1
-            self.k_ext = external_scale * self.k_ext / ext_eig
+        if {'beta_ext'} <= spec.keys():
+            self.k_ext = spec['beta_ext'] * self.k_ext
+        else:
+            if (not {'skip_ext_scale'} <= spec.keys()) or (not spec['skip_ext_scale']):
+                ext_eig = max(eig(
+                    diag(self.sus).dot((1/spec['symp_onset_rate']) *
+                     (self.k_ext).dot(self.inf_scales[0]) +
+                     (1/spec['recovery_rate']) *
+                      (self.k_ext).dot(diag(self.inf_scales[1])))
+                    )[0])
+                if spec['fit_method'] == 'R*':
+                    external_scale = spec['R*'] / (self.ave_hh_size*spec['SITP'])
+                else:
+                    external_scale = 1
+                self.k_ext = external_scale * self.k_ext / ext_eig
 
         # To define the iso_rates property, we add some zeros which act as dummy
         # entries so that the index of the isolation rates match the
