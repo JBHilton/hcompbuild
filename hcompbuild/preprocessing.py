@@ -495,7 +495,7 @@ class ModelInput(ABC):
         return eig(k_home_scaled)[0].max()
 
 class SIRInput(ModelInput):
-    def __init__(self, spec, composition_list=None, composition_distribution=None):
+    def __init__(self, spec, composition_list=None, composition_distribution=None, print_ests = False):
         super().__init__(spec, composition_list, composition_distribution)
 
         self.expandables = ['sus']
@@ -529,7 +529,8 @@ class SIRInput(ModelInput):
             pars = minimize(sitp_rmse, array([1e-1,1]), bounds=((0,None),(0,1))).x
             self.beta_int = pars[0]
             self.density_expo = pars[1]
-            print('Estimated beta_int=',pars[0],', estimated density=',pars[1])
+            if print_ests:
+                print('Estimated beta_int=',pars[0],', estimated density=',pars[1])
 
         self.k_home = self.beta_int * self.k_home
 
@@ -548,7 +549,7 @@ class SIRInput(ModelInput):
                 self.k_ext = external_scale * self.k_ext / ext_eig
 
 class SEIRInput(ModelInput):
-    def __init__(self, spec, composition_list=None, composition_distribution=None, print_ests=True):
+    def __init__(self, spec, composition_list=None, composition_distribution=None, print_ests=False):
         super().__init__(spec, composition_list, composition_distribution)
 
         self.expandables = ['sus',
@@ -580,7 +581,8 @@ class SEIRInput(ModelInput):
             pars = minimize(sitp_rmse, array([1e-1,1]), bounds=((0,None),(0,1))).x
             self.beta_int = pars[0]
             self.density_expo = pars[1]
-            print('Estimated beta_int=',pars[0],', estimated density=',pars[1])
+            if print_ests:
+                print('Estimated beta_int=',pars[0],', estimated density=',pars[1])
 
         self.k_home = self.beta_int * self.k_home
 
@@ -669,7 +671,7 @@ class SEPIRInput(ModelInput):
         return self.spec['incubation_rate']
 
 class SEPIRQInput(ModelInput):
-    def __init__(self, spec, composition_list=None, composition_distribution=None):
+    def __init__(self, spec, composition_list=None, composition_distribution=None, print_ests=False):
         super().__init__(spec, composition_list, composition_distribution)
 
         self.expandables = ['sus',
@@ -713,7 +715,8 @@ class SEPIRQInput(ModelInput):
             pars = minimize(sitp_rmse, array([1e-1,1]), bounds=((0,None),(0,1))).x
             self.beta_int = pars[0]
             self.density_expo = pars[1]
-            print('Estimated beta_int=',pars[0],', estimated density=',pars[1])
+            if print_ests:
+                print('Estimated beta_int=',pars[0],', estimated density=',pars[1])
 
         self.k_home = self.beta_int * self.k_home
 
@@ -803,7 +806,6 @@ def get_multiplier_by_path_integral(r,
     start = get_time()
     sA_iLU = spilu(discount_matrix.tocsc())
     M = LinearOperator(discount_matrix.shape, sA_iLU.solve)
-    # print('Precondtioner computed in {0}s'.format(get_time() - start))
     mult_start = get_time()
     for i, index_state in enumerate(index_states):
         result = isolve(discount_matrix, reward_mat[:, i], M=M)
@@ -813,7 +815,6 @@ def get_multiplier_by_path_integral(r,
             (range(no_index_states),
             no_index_states * [i] )),
             shape=(no_index_states, no_index_states))
-    # print('multiplier calculation took',get_time()-mult_start,'seconds.')
     return multiplier
 
 def get_multiplier_eigenvalue(r,
@@ -829,7 +830,6 @@ def get_multiplier_eigenvalue(r,
     start = get_time()
     sA_iLU = spilu(discount_matrix)
     M = LinearOperator(discount_matrix.shape, sA_iLU.solve)
-    # print('Precondtioner computed in {0}s'.format(get_time() - start))
     mult_start = get_time()
     for i, index_state in enumerate(index_states):
         result = isolve(discount_matrix, reward_mat[:, i], M=M)
@@ -839,7 +839,6 @@ def get_multiplier_eigenvalue(r,
             (range(no_index_states),
             no_index_states * [i] )),
             shape=(no_index_states, no_index_states))
-    # print('multiplier calculation took',get_time()-mult_start,'seconds.')
     if multiplier.shape==(1,1):
         evalue = multiplier[0, 0]
     elif multiplier.shape==(2,2):
@@ -853,7 +852,8 @@ def estimate_growth_rate(household_population,
                          interval=[-1, 1],
                          tol=1e-3,
                          x0=1e-3,
-                         r_min_discount=0.95):
+                         r_min_discount=0.95,
+                         verbose = False):
 
     reverse_comp_dist = diag(household_population.composition_distribution). \
         dot(household_population.composition_list)
@@ -902,7 +902,9 @@ def estimate_growth_rate(household_population,
             r_min = r_max - r_min_discount * (r_max - r_min)
 
     r_now = root_output.root
-    print('converged in',root_output.iterations,'iterations.')
+
+    if verbose:
+        print('converged in',root_output.iterations,'iterations.')
 
     return r_now
 
